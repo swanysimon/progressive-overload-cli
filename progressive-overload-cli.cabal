@@ -1,27 +1,50 @@
-name: progressive-overload-cli
-version: 0.1.0.0
-synopsis: A tool for helping you program your workouts.
-license:  MIT
-license-file: LICENSE
-author: Simon Swanson
-maintainer: nomiswanson@gmail.com
-homepage: https://github.com/swanysimon/progressive-overload-cli
+-- This file has been generated from package.yaml by hpack version 0.23.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 3164218b36b1dd5919075d5e49c5aa5d0747d1738f3ee886ab37bed17e163e4d
 
-cabal-version: >=1.10
-build-type: Simple
+name:           progressive-overload-cli
+version:        0.1.1
+synopsis:       A tool for helping you program your workouts.
+description:    See README at <https://github.com/swanysimon/progressive-overload-cli#readme>
+license:        MIT
+license-file:   LICENSE
+maintainer:     Simon Swanson <nomiswanson@gmail.com>
+homepage:       https://github.com/swanysimon/progressive-overload-cli#readme
+bug-reports:    https://github.com/swanysimon/progressive-overload-cli/issues
+cabal-version:  >= 1.10
+build-type:     Simple
 
 extra-source-files:
     ChangeLog.md
-    README.md
 
-executable progressive-overload-cli
-    main-is: Main.hs
-    default-language: Haskell2010
-    build-depends:
-        base == 4.10.1.0
+source-repository head
+    type: git
+    location: https://github.com/swanysimon/progressive-overload-cli
+
+executable progressive-overload
+    main-is: ProgressiveOverload.hs
+    other-modules:
+        Training.Exercise
+        Training.Repetitions
+        Training.Set
+        Training.Units
+        Training.Weight
+        Training.WorkingSet
+        Training.Workout
+        Paths_progressive_overload_cli
     hs-source-dirs:
         bin
         src
+    ghc-options: -Wall
+    build-depends:
+        base ==4.10.1.0
+    default-language: Haskell2010
+
+test-suite spec
+    type: exitcode-stdio-1.0
+    main-is: TestRunner.hs
     other-modules:
         Training.Exercise
         Training.Repetitions
@@ -30,25 +53,15 @@ executable progressive-overload-cli
         Training.Weight
         Training.WorkingSet
         Training.Workout
-
-test-suite tests
-    type: exitcode-stdio-1.0
-    main-is: TestRunner.hs
-    default-language: Haskell2010
-    build-depends:
-        base == 4.10.1.0,
-        hspec == 2.4.7,
-        random == 1.1
+        Training.WeightTests
+        Paths_progressive_overload_cli
     hs-source-dirs:
         src
         test-src
-    other-modules:
-        Training.Exercise
-        Training.Repetitions
-        Training.Set
-        Training.Units
-        Training.Weight
-        Training.WeightTests
-        Training.WorkingSet
-        Training.Workout
-
+    ghc-options: -Wall
+    cpp-options: -DTEST
+    build-depends:
+        base ==4.10.1.0,
+        hspec ==2.4.7,
+        random ==1.1
+    default-language: Haskell2010

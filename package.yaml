@@ -1,0 +1,34 @@
+name: progressive-overload-cli
+version: 0.1.1
+synopsis: A tool for helping you program your workouts.
+description: See README at <https://github.com/swanysimon/progressive-overload-cli#readme>
+license:  MIT
+maintainer: Simon Swanson <nomiswanson@gmail.com>
+github: swanysimon/progressive-overload-cli
+
+extra-source-files:
+    ChangeLog.md
+
+ghc-options: -Wall
+
+dependencies:
+    - base == 4.10.1.0
+
+executables:
+    progressive-overload:
+        main: ProgressiveOverload.hs
+        source-dirs:
+            - bin
+            - src
+
+tests:
+    spec:
+        cpp-options: -DTEST
+        main: TestRunner.hs
+        source-dirs:
+            - src
+            - test-src
+        dependencies:
+            - hspec == 2.4.7
+            - random == 1.1
+
