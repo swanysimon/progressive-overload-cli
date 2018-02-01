@@ -26,8 +26,8 @@ testConvertUnits = do
 test_0_kilograms_is_0_pounds :: Expectation
 test_0_kilograms_is_0_pounds = checkWeightsEqual zeroKg zeroPounds
     where
-        zeroKg = Weight (toRational 0) Kilograms
-        zeroPounds = Weight (toRational 0) Pounds
+        zeroKg = Weight 0 Kilograms
+        zeroPounds = Weight 0 Pounds
 
 checkWeightsEqual :: Weight -> Weight -> Expectation
 checkWeightsEqual weight@(Weight _ units) otherWeight@(Weight _ otherUnits) = do
@@ -46,8 +46,8 @@ shouldBeSymmetric x y = do
 test_20_kilograms_is_44_1_pounds :: Expectation
 test_20_kilograms_is_44_1_pounds = checkWeightsEqual twentyKg fortyFourOnePounds
     where
-        twentyKg = Weight (toRational 20) Kilograms
-        fortyFourOnePounds = Weight (toRational 44.1) Pounds
+        twentyKg = Weight 20 Kilograms
+        fortyFourOnePounds = Weight 44.1 Pounds
 
 test_random_kilogram_conversions :: Expectation
 test_random_kilogram_conversions = checkTenRandomConversions (\x -> Weight x Kilograms) Pounds

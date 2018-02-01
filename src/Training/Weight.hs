@@ -35,6 +35,7 @@ convertWeightUnits weight@(Weight x oldUnits) newUnits
     | newUnits == oldUnits = weight
     | newUnits == Pounds = Weight newPoundWeight Pounds
     | newUnits == Kilograms = Weight newKiloWeight Kilograms
+    | otherwise = error $ "Unknown unit provided in weight: " ++ show weight
         where
             kiloToPoundRatio = 441 % 200
             newPoundWeight = x * kiloToPoundRatio

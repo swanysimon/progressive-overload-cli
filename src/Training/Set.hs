@@ -3,8 +3,6 @@ module Training.Set (
     ) where
 
 import Training.Exercise
-import Training.Repetitions
-import Training.Weight
 import Training.WorkingSet
 
 data Set = Set Exercise WorkingSet
