@@ -1,9 +1,8 @@
 module Training.Workout (
-        Workout,
+        Workout
     ) where
 
 import Training.Set
 
-newtype Workout = Workout [Set]
-    deriving (Eq)
+type Workout = [Set]
 

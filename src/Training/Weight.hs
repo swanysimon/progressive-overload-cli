@@ -1,19 +1,21 @@
 module Training.Weight (
-        Weight,
+        Weight(..),
         addWeight,
         addWeights ,
         convertWeightUnits,
         multiplyWeight
     ) where
 
+import Data.Ratio
 import Training.Units
 
 data Weight = Weight Rational Units
+    deriving (Read, Show)
 
 instance Eq Weight where
-    (==) (Weight x units) otherWeight = x == y
+    (==) (Weight x units) otherWeight = x == y && units == newUnits
         where
-            (Weight y _) = convertWeightUnits otherWeight units
+            (Weight y newUnits) = convertWeightUnits otherWeight units
 
 addWeight :: (Real a) => Weight -> a -> Weight
 addWeight (Weight x units) weightToAdd = Weight newWeight units
@@ -28,19 +30,19 @@ addWeights weight@(Weight x units) otherWeight@(Weight y otherUnits)
         where
             convertedWeight = convertWeightUnits otherWeight units
 
-multiplyWeight :: (Real a) => Weight -> a -> Weight
-multiplyWeight (Weight x units) scalar = Weight newWeight units
-    where
-        rationalScalar = toRational scalar
-        newWeight = x * rationalScalar
-
 convertWeightUnits :: Weight -> Units -> Weight
 convertWeightUnits weight@(Weight x oldUnits) newUnits
     | newUnits == oldUnits = weight
     | newUnits == Pounds = Weight newPoundWeight Pounds
     | newUnits == Kilograms = Weight newKiloWeight Kilograms
         where
-            kiloToPoundRatio = toRational 2.205
+            kiloToPoundRatio = 441 % 200
             newPoundWeight = x * kiloToPoundRatio
             newKiloWeight = x * (1 / kiloToPoundRatio)
+
+multiplyWeight :: (Real a) => Weight -> a -> Weight
+multiplyWeight (Weight x units) scalar = Weight newWeight units
+    where
+        rationalScalar = toRational scalar
+        newWeight = x * rationalScalar
 

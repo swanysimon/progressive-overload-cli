@@ -3,5 +3,5 @@ module Training.Units (
     ) where
 
 data Units = Kilograms | Pounds
-    deriving (Eq)
+    deriving (Eq, Read, Show)
 
