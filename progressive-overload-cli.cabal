@@ -1,8 +1,8 @@
--- This file has been generated from package.yaml by hpack version 0.22.0.
+-- This file has been generated from package.yaml by hpack version 0.20.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ebb5965fd33def9206ded79eba04527578c4f35f87ca8e2337cb3742c1affb2a
+-- hash: 50d9c84d66098927b5529ca43e5fba8fc2f1b0619333aadea516af6e43a8fade
 
 name:           progressive-overload-cli
 version:        0.1.1
@@ -25,33 +25,13 @@ source-repository head
 
 executable progressive-overload
   main-is: ProgressiveOverload.hs
-  other-modules:
-      Plan.Juggernaut.JuggernautProgram
-      Plan.Juggernaut.JuggernautWave
-      Plan.Program
-      Training.Exercise
-      Training.Repetitions
-      Training.Set
-      Training.Units
-      Training.Weight
-      Training.WorkingSet
-      Training.Workout
-      Paths_progressive_overload_cli
   hs-source-dirs:
       bin
       src
   ghc-options: -Wall
   build-depends:
       base ==4.10.1.0
-  default-language: Haskell2010
-
-test-suite spec
-  type: exitcode-stdio-1.0
-  main-is: TestRunner.hs
   other-modules:
-      Plan.Juggernaut.JuggernautProgram
-      Plan.Juggernaut.JuggernautWave
-      Plan.Program
       Training.Exercise
       Training.Repetitions
       Training.Set
@@ -59,8 +39,12 @@ test-suite spec
       Training.Weight
       Training.WorkingSet
       Training.Workout
-      Training.WeightTests
       Paths_progressive_overload_cli
+  default-language: Haskell2010
+
+test-suite spec
+  type: exitcode-stdio-1.0
+  main-is: TestRunner.hs
   hs-source-dirs:
       src
       test-src
@@ -70,4 +54,14 @@ test-suite spec
       base ==4.10.1.0
     , hspec ==2.4.7
     , random ==1.1
+  other-modules:
+      Training.Exercise
+      Training.Repetitions
+      Training.Set
+      Training.Units
+      Training.Weight
+      Training.WorkingSet
+      Training.Workout
+      Training.WeightTests
+      Paths_progressive_overload_cli
   default-language: Haskell2010
