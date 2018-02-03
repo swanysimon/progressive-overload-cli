@@ -3,27 +3,28 @@ module Training.WeightTests (
         spec
     ) where
 
-import Data.Ratio
-import System.Random
 import Test.Hspec
 import Training.Units
 import Training.Weight
+import Training.WeightTestsHelper
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
 spec = do
-        describe "convertWeightUnits" testConvertUnits
-        describe "addWeight" testAddWeight
+        describe "convertWeightUnits" unitConverstionTests
+        describe "addWeight" addScalarToWeightTests
+        describe "addWeights" addWeightToWeightTests
+        describe "multiplyWeight" multiplyWeightTests
 
-testConvertUnits :: SpecWith ()
-testConvertUnits = do
+unitConverstionTests :: SpecWith ()
+unitConverstionTests = do
         it "tests 0 kilograms is 0 pounds" test_0_kilograms_is_0_pounds
         it "tests 20 kilograms is 44.1 pounds" test_20_kilograms_is_44_1_pounds
         it "tests 10 random kilogram conversions" test_random_kilogram_conversions
         it "tests 10 random pound conversions" test_random_pound_conversions
-        -- if any of the random number tests ever fails, add it's specific test case below this line
+        -- if any of the randomized tests ever fails, add the specific test case below this line
 
 test_0_kilograms_is_0_pounds :: Expectation
 test_0_kilograms_is_0_pounds = checkWeightsEqual zeroKg zeroPounds
@@ -34,81 +35,90 @@ zeroKg = Weight 0 Kilograms
 zeroPounds :: Weight
 zeroPounds = Weight 0 Pounds
 
-checkWeightsEqual :: Weight -> Weight -> Expectation
-checkWeightsEqual weight@(Weight _ units) otherWeight@(Weight _ otherUnits) = do
-        weight `shouldBeSymmetric` otherWeight
-        convertedWeight `shouldBeSymmetric` otherWeight
-        convertedWeight `shouldBeSymmetric` convertedOtherWeight
-    where
-        convertedWeight = convertWeightUnits weight otherUnits
-        convertedOtherWeight = convertWeightUnits otherWeight units
-
-shouldBeSymmetric :: (HasCallStack, Show a, Eq a) => a -> a -> Expectation
-shouldBeSymmetric x y = do
-        x `shouldBe` y
-        y `shouldBe` x
-
 test_20_kilograms_is_44_1_pounds :: Expectation
 test_20_kilograms_is_44_1_pounds = checkWeightsEqual twentyKg fortyFourOnePounds
-    where
-        twentyKg = Weight 20 Kilograms
-        fortyFourOnePounds = Weight 44.1 Pounds
+
+twentyKg :: Weight
+twentyKg = Weight 20 Kilograms
+
+fortyFourOnePounds :: Weight
+fortyFourOnePounds = Weight 44.1 Pounds
 
 test_random_kilogram_conversions :: Expectation
-test_random_kilogram_conversions = checkTenRandomConversions (\w -> Weight w Kilograms) Pounds
-
-checkTenRandomConversions :: (Rational -> Weight) -> Units -> Expectation
-checkTenRandomConversions newWeightFunction newUnits = do
-        randomWeights <- getNRandomWeights 10 newWeightFunction
-        mapM_ checkConvertedWeight randomWeights
-    where
-        checkConvertedWeight weight = checkWeightsEqual weight (convertedWeight weight)
-        convertedWeight weight = convertWeightUnits weight newUnits
-
-getNRandomWeights :: Int -> (Rational -> Weight) -> IO [Weight]
-getNRandomWeights n newWeightFunction = fmap toRandomWeights newStdGen
-    where
-        toRandomWeights = take n . map randomToWeight . randomRs randomRange
-        randomToWeight = newWeightFunction . toRational
-
--- need the number to be positive and the upper bound is something unreasonable to lift regardless of unit
-randomRange :: (Double, Double)
-randomRange = (0, 5000)
+test_random_kilogram_conversions = checkTenRandomConversions Kilograms Pounds
 
 test_random_pound_conversions :: Expectation
-test_random_pound_conversions = checkTenRandomConversions (\w -> Weight w Pounds) Kilograms
+test_random_pound_conversions = checkTenRandomConversions Pounds Kilograms
 
-testAddWeight :: SpecWith ()
-testAddWeight = do
-        it "tests 0 kilograms plus 10 is 10 kilograms" test_0_kilograms_plus_10
+addScalarToWeightTests :: SpecWith ()
+addScalarToWeightTests = do
+        it "tests 0 kilograms plus 10 is 10 kilograms" test_0_kilograms_plus_20
         it "tests 10 random kilogram additions" test_random_kilogram_additions
         it "tests 10 random pound additions" test_random_pound_additions
-        -- if any of the random number tests ever fails, add it's specific test case below this line
+        -- if any of the randomized tests ever fails, add the specific test case below this line
 
-test_0_kilograms_plus_10 :: Expectation
-test_0_kilograms_plus_10 = checkWeightsEqual zeroPlusTenKilograms tenKilograms
+test_0_kilograms_plus_20 :: Expectation
+test_0_kilograms_plus_20 = checkWeightsEqual zeroPlusTwentyKilograms twentyKg
     where
-        zeroPlusTenKilograms = addWeight zeroKg ten
-        ten = (10 % 1)
-        tenKilograms = Weight ten Kilograms
+        zeroPlusTwentyKilograms = addWeight zeroKg (20 :: Double)
 
 test_random_kilogram_additions :: Expectation
-test_random_kilogram_additions = checkTenRandomAdditions (\w -> Weight w Kilograms)
-
-checkTenRandomAdditions :: (Rational -> Weight) -> Expectation
-checkTenRandomAdditions newWeightFunction = do
-        randomWeights <- getNRandomWeights 10 newWeightFunction
-        mapM_ checkAddedWeight randomWeights
-
-checkAddedWeight :: Weight -> Expectation
-checkAddedWeight weight@(Weight w units) = do
-        randomNumToAdd <- fmap toRandomRational newStdGen
-        let addedWeight = addWeight weight randomNumToAdd
-        let directlyAddedWeight = Weight (w + randomNumToAdd) units
-        checkWeightsEqual addedWeight directlyAddedWeight
-    where
-        toRandomRational = toRational . fst . randomR randomRange
+test_random_kilogram_additions = checkTenRandomAdditions Kilograms
 
 test_random_pound_additions :: Expectation
-test_random_pound_additions = checkTenRandomAdditions (\w -> Weight w Pounds)
+test_random_pound_additions = checkTenRandomAdditions Pounds
+
+addWeightToWeightTests :: SpecWith ()
+addWeightToWeightTests = do
+        it "tests 0 kilograms plus 0 pounds is 0 kilograms" test_0_kilograms_plus_0_pounds
+        it "tests 20 kilograms plus 44.1 pounds is 40 kilograms" test_20_kilograms_plus_44_1_pounds
+        it "tests 10 random kilograms plus kilograms operations" test_random_kilograms_plus_kilograms_operations
+        it "tests 10 random pounds plus pounds operations" test_random_pounds_plus_pounds_operations
+        -- if any of the randomized tests ever fails, add the specific test case below this line
+
+test_0_kilograms_plus_0_pounds :: Expectation
+test_0_kilograms_plus_0_pounds = do
+        checkWeightsEqual zeroWeightsAdded zeroKg
+        w `shouldBe` 0
+        units `shouldBe` Kilograms
+    where
+        zeroWeightsAdded@(Weight w units) = addWeights zeroKg zeroPounds
+
+test_20_kilograms_plus_44_1_pounds :: Expectation
+test_20_kilograms_plus_44_1_pounds = do
+        checkWeightsEqual addedWeights fortyKg
+        w `shouldBe` 40
+        units `shouldBe` Kilograms
+    where
+        addedWeights@(Weight w units) = addWeights twentyKg fortyFourOnePounds
+
+fortyKg :: Weight
+fortyKg = Weight 40 Kilograms
+
+test_random_kilograms_plus_kilograms_operations :: Expectation
+test_random_kilograms_plus_kilograms_operations = checkTenRandomSameUnitAdditions Kilograms
+
+test_random_pounds_plus_pounds_operations :: Expectation
+test_random_pounds_plus_pounds_operations = checkTenRandomSameUnitAdditions Pounds
+
+multiplyWeightTests :: SpecWith ()
+multiplyWeightTests = do
+        it "tests 0 kilograms times any scalar is 0 kilograms" test_0_kilogram_multiplication
+        it "tests 20 kilograms times 2 is 40 kilograms" test_20_kilograms_times_2
+        it "tests 10 random kilograms products" test_random_kilogram_products
+        -- if any of the randomized tests ever fails, add the specific test case below this line
+
+test_0_kilogram_multiplication :: Expectation
+test_0_kilogram_multiplication = do
+        randomNum <- getRandomRational
+        let weightProduct = multiplyWeight zeroKg randomNum
+        checkWeightsEqual zeroKg weightProduct
+
+test_20_kilograms_times_2 :: Expectation
+test_20_kilograms_times_2 = checkWeightsEqual fortyKg weightProduct
+    where
+        weightProduct = multiplyWeight twentyKg (2 :: Double)
+
+test_random_kilogram_products :: Expectation
+test_random_kilogram_products = checkTenRandomProducts Kilograms
 
