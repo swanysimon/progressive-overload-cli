@@ -13,46 +13,14 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-        describe "convertWeightUnits" unitConverstionTests
         describe "addWeight" addScalarToWeightTests
         describe "addWeights" addWeightToWeightTests
-        describe "multiplyWeight" multiplyWeightTests
-
-unitConverstionTests :: SpecWith ()
-unitConverstionTests = do
-        it "tests 0 kilograms is 0 pounds" test_0_kilograms_is_0_pounds
-        it "tests 20 kilograms is 44.1 pounds" test_20_kilograms_is_44_1_pounds
-        it "tests 10 random kilogram conversions" test_random_kilogram_conversions
-        it "tests 10 random pound conversions" test_random_pound_conversions
-        -- if any of the randomized tests ever fails, add the specific test case below this line
-
-test_0_kilograms_is_0_pounds :: Expectation
-test_0_kilograms_is_0_pounds = checkWeightsEqual zeroKg zeroPounds
-
-zeroKg :: Weight
-zeroKg = Weight 0 Kilograms
-
-zeroPounds :: Weight
-zeroPounds = Weight 0 Pounds
-
-test_20_kilograms_is_44_1_pounds :: Expectation
-test_20_kilograms_is_44_1_pounds = checkWeightsEqual twentyKg fortyFourOnePounds
-
-twentyKg :: Weight
-twentyKg = Weight 20 Kilograms
-
-fortyFourOnePounds :: Weight
-fortyFourOnePounds = Weight 44.1 Pounds
-
-test_random_kilogram_conversions :: Expectation
-test_random_kilogram_conversions = checkTenRandomConversions Kilograms Pounds
-
-test_random_pound_conversions :: Expectation
-test_random_pound_conversions = checkTenRandomConversions Pounds Kilograms
+        describe "convertWeightUnits" convertWeightUnitsTests
+        describe "multiplyWeight" multiplyWeightByScalarTests
 
 addScalarToWeightTests :: SpecWith ()
 addScalarToWeightTests = do
-        it "tests 0 kilograms plus 10 is 10 kilograms" test_0_kilograms_plus_20
+        it "tests 0 kilograms plus 20 is 20 kilograms" test_0_kilograms_plus_20
         it "tests 10 random kilogram additions" test_random_kilogram_additions
         it "tests 10 random pound additions" test_random_pound_additions
         -- if any of the randomized tests ever fails, add the specific test case below this line
@@ -92,17 +60,34 @@ test_20_kilograms_plus_44_1_pounds = do
     where
         addedWeights@(Weight w units) = addWeights twentyKg fortyFourOnePounds
 
-fortyKg :: Weight
-fortyKg = Weight 40 Kilograms
-
 test_random_kilograms_plus_kilograms_operations :: Expectation
 test_random_kilograms_plus_kilograms_operations = checkTenRandomSameUnitAdditions Kilograms
 
 test_random_pounds_plus_pounds_operations :: Expectation
 test_random_pounds_plus_pounds_operations = checkTenRandomSameUnitAdditions Pounds
 
-multiplyWeightTests :: SpecWith ()
-multiplyWeightTests = do
+convertWeightUnitsTests :: SpecWith ()
+convertWeightUnitsTests = do
+        it "tests 0 kilograms is 0 pounds" test_0_kilograms_is_0_pounds
+        it "tests 20 kilograms is 44.1 pounds" test_20_kilograms_is_44_1_pounds
+        it "tests 10 random kilogram conversions" test_random_kilogram_conversions
+        it "tests 10 random pound conversions" test_random_pound_conversions
+        -- if any of the randomized tests ever fails, add the specific test case below this line
+
+test_0_kilograms_is_0_pounds :: Expectation
+test_0_kilograms_is_0_pounds = checkWeightsEqual zeroKg zeroPounds
+
+test_20_kilograms_is_44_1_pounds :: Expectation
+test_20_kilograms_is_44_1_pounds = checkWeightsEqual twentyKg fortyFourOnePounds
+
+test_random_kilogram_conversions :: Expectation
+test_random_kilogram_conversions = checkTenRandomConversions Kilograms Pounds
+
+test_random_pound_conversions :: Expectation
+test_random_pound_conversions = checkTenRandomConversions Pounds Kilograms
+
+multiplyWeightByScalarTests :: SpecWith ()
+multiplyWeightByScalarTests = do
         it "tests 0 kilograms times any scalar is 0 kilograms" test_0_kilogram_multiplication
         it "tests 20 kilograms times 2 is 40 kilograms" test_20_kilograms_times_2
         it "tests 10 random kilograms products" test_random_kilogram_products

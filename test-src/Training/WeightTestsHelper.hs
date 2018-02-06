@@ -4,7 +4,12 @@ module Training.WeightTestsHelper (
         checkTenRandomProducts,
         checkTenRandomSameUnitAdditions,
         checkWeightsEqual,
-        getRandomRational
+        fortyFourOnePounds,
+        fortyKg,
+        getRandomRational,
+        twentyKg,
+        zeroKg,
+        zeroPounds
     ) where
 
 import System.Random
@@ -26,16 +31,16 @@ shouldBeSymmetric x y = do
         x `shouldBe` y
         y `shouldBe` x
 
-checkTenRandomConversions :: Units -> Units -> Expectation
-checkTenRandomConversions units newUnits = do
-        randomWeights <- getTenRandomWeights units
-        mapM_ checkConvertedWeight randomWeights
-    where
-        checkConvertedWeight weight = checkWeightsEqual weight (convertedWeight weight)
-        convertedWeight weight = convertWeightUnits weight newUnits
+zeroKg :: Weight
+zeroKg = Weight 0 Kilograms
 
-rationalToWeightFunction :: Units -> (Rational -> Weight)
-rationalToWeightFunction units = (\w -> Weight w units)
+twentyKg :: Weight
+twentyKg = Weight 20 Kilograms
+
+checkTenRandomAdditions :: Units -> Expectation
+checkTenRandomAdditions units = do
+        randomWeights <- getTenRandomWeights units
+        mapM_ getAndCheckRandomAddedWeight randomWeights
 
 getTenRandomWeights :: Units -> IO [Weight]
 getTenRandomWeights units = fmap toRandomWeights newStdGen
@@ -43,14 +48,12 @@ getTenRandomWeights units = fmap toRandomWeights newStdGen
         toRandomWeights = take 10 . map randomToWeight . randomRs randomRange
         randomToWeight = rationalToWeightFunction units . toRational
 
+rationalToWeightFunction :: Units -> Rational -> Weight
+rationalToWeightFunction units w = Weight w units
+
 -- need the number to be positive and the upper bound is something unreasonable to lift regardless of unit
 randomRange :: (Double, Double)
 randomRange = (0, 5000)
-
-checkTenRandomAdditions :: Units -> Expectation
-checkTenRandomAdditions units = do
-        randomWeights <- getTenRandomWeights units
-        mapM_ getAndCheckRandomAddedWeight randomWeights
 
 getAndCheckRandomAddedWeight :: Weight -> Expectation
 getAndCheckRandomAddedWeight weight@(Weight w units) = do
@@ -60,9 +63,16 @@ getAndCheckRandomAddedWeight weight@(Weight w units) = do
         checkWeightsEqual addedWeight directlyAddedWeight
 
 getRandomRational :: IO Rational
-getRandomRational = fmap toRandomRational newStdGen
-    where
-        toRandomRational = toRational . fst . randomR randomRange
+getRandomRational = fmap (toRational . fst . randomR randomRange) newStdGen
+
+zeroPounds :: Weight
+zeroPounds = Weight 0 Pounds
+
+fortyKg :: Weight
+fortyKg = Weight 40 Kilograms
+
+fortyFourOnePounds :: Weight
+fortyFourOnePounds = Weight 44.1 Pounds
 
 checkTenRandomSameUnitAdditions :: Units -> Expectation
 checkTenRandomSameUnitAdditions units = do
@@ -78,6 +88,14 @@ getAndCheckSameUnitAddedRandomizedWeights weight@(Weight w units) = do
 
 getRandomWeight :: Units -> IO Weight
 getRandomWeight units = fmap (rationalToWeightFunction units) getRandomRational
+
+checkTenRandomConversions :: Units -> Units -> Expectation
+checkTenRandomConversions units newUnits = do
+        randomWeights <- getTenRandomWeights units
+        mapM_ checkConvertedWeight randomWeights
+    where
+        checkConvertedWeight weight = checkWeightsEqual weight (convertedWeight weight)
+        convertedWeight weight = convertWeightUnits weight newUnits
 
 checkTenRandomProducts :: Units -> Expectation
 checkTenRandomProducts units = do
