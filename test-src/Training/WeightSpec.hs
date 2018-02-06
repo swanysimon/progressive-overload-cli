@@ -1,4 +1,4 @@
-module Training.WeightTests (
+module Training.WeightSpec (
         main, -- only here so module can be run from ghci for debugging
         spec
     ) where
