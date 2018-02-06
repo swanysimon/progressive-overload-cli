@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fd3c48800cb0786234731c6a66314c30e8cd191c8b929d4751118e0f4dac6d8c
+-- hash: b783c4e0c98d86301d5d5f6a91566c40e1cc459df56471f2e655652348f9d9b8
 
 name:           progressive-overload-cli
 version:        0.1.1
@@ -32,6 +32,7 @@ executable progressive-overload
   build-depends:
       base ==4.10.1.0
   other-modules:
+      Plan.Program
       Training.Exercise
       Training.Repetitions
       Training.Set
@@ -55,6 +56,7 @@ test-suite spec
     , hspec ==2.4.7
     , random ==1.1
   other-modules:
+      Plan.Program
       Training.Exercise
       Training.Repetitions
       Training.Set
