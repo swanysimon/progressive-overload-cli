@@ -1,15 +1,18 @@
 module Plan.Program (
-        getWorkout,
-        getFromPreviousWorkout,
-        start,
-        update
+        Program,
+        asWorkout,
+        begin,
+        next
     ) where
 
+import Training.Exercise
+import Training.Weight
 import Training.Workout
 
 class Program p where
-    getWorkout :: p -> Workout
-    getFromPreviousWorkout :: p -> Workout -> Workout
-    start :: p -> IO ()
-    update :: p -> IO ()
+    asWorkout :: p -> Workout
+
+    begin :: Exercise -> Weight -> p
+
+    next :: p -> Workout -> p
 

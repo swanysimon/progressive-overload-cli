@@ -1,5 +1,5 @@
 module Training.Weight (
-        Weight(..),
+        Weight(Weight),
         addWeight,
         addWeights ,
         convertWeightUnits,
@@ -37,13 +37,13 @@ convertWeightUnits weight@(Weight x oldUnits) newUnits
     | newUnits == Kilograms = Weight newKiloWeight Kilograms
     | otherwise = error $ "Unknown unit provided in weight: " ++ show weight
         where
-            kiloToPoundRatio = 441 % 200 -- 20 kilograms is exactly 44.1 pounds for our purposes
             newPoundWeight = x * kiloToPoundRatio
+            kiloToPoundRatio = 441 % 200 -- 20 kilograms is exactly 44.1 pounds for our purposes
             newKiloWeight = x * (1 / kiloToPoundRatio)
 
 multiplyWeight :: (Real a) => Weight -> a -> Weight
 multiplyWeight (Weight x units) scalar = Weight newWeight units
     where
-        rationalScalar = toRational scalar
         newWeight = x * rationalScalar
+        rationalScalar = toRational scalar
 

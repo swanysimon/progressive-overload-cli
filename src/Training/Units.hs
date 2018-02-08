@@ -1,5 +1,5 @@
 module Training.Units (
-        Units(..)
+        Units(Kilograms, Pounds)
     ) where
 
 data Units = Kilograms | Pounds
