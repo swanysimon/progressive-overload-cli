@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 257b588672a6cce629f2051cf98620920d2ab66bf126c4ecb60d9e0770393e0c
+-- hash: 7cf841089af51ae4281fa89b7252e4d14906f5084267ee44766e23eadc75d724
 
 name:           progressive-overload-cli
 version:        0.1.1
@@ -32,6 +32,7 @@ executable progressive-overload
   build-depends:
       base ==4.10.1.0
   other-modules:
+      Plan.CommonPercentages
       Plan.Juggernaut.JuggernautPhase
       Plan.Juggernaut.JuggernautProgram
       Plan.Juggernaut.JuggernautWave
@@ -60,6 +61,7 @@ test-suite spec
     , hspec ==2.4.7
     , random ==1.1
   other-modules:
+      Plan.CommonPercentages
       Plan.Juggernaut.JuggernautPhase
       Plan.Juggernaut.JuggernautProgram
       Plan.Juggernaut.JuggernautWave

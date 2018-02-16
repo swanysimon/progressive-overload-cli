@@ -13,10 +13,22 @@ main = hspec spec
 
 spec :: Spec
 spec = do
+        describe "checkOrdering" checkOrderingTests
         describe "addWeight" addScalarToWeightTests
         describe "addWeights" addWeightToWeightTests
         describe "convertWeightUnits" convertWeightUnitsTests
         describe "multiplyWeight" multiplyWeightByScalarTests
+
+checkOrderingTests :: SpecWith ()
+checkOrderingTests = do
+        it "tests 0 kilograms is less than 20 kilograms" test_0_kilograms_less_than_20_kilograms
+        it "tests 0 kilograms is less than 44.1 pounds" test_0_kilograms_less_than_44_1_pounds
+
+test_0_kilograms_less_than_20_kilograms :: Expectation
+test_0_kilograms_less_than_20_kilograms = checkWeightLessThan zeroKg twentyKg
+
+test_0_kilograms_less_than_44_1_pounds :: Expectation
+test_0_kilograms_less_than_44_1_pounds = checkWeightLessThan zeroKg fortyFourOnePounds
 
 addScalarToWeightTests :: SpecWith ()
 addScalarToWeightTests = do

@@ -3,6 +3,7 @@ module Training.WeightTestsHelper (
         checkTenRandomConversions,
         checkTenRandomProducts,
         checkTenRandomSameUnitAdditions,
+        checkWeightLessThan,
         checkWeightsEqual,
         fortyFourOnePounds,
         fortyKg,
@@ -16,6 +17,11 @@ import System.Random
 import Test.Hspec
 import Training.Units
 import Training.Weight
+
+checkWeightLessThan :: Weight -> Weight -> Expectation
+checkWeightLessThan weight otherWeight = do
+        weight `shouldSatisfy` (otherWeight >)
+        otherWeight `shouldSatisfy` (weight <)
 
 checkWeightsEqual :: Weight -> Weight -> Expectation
 checkWeightsEqual weight@(Weight _ units) otherWeight@(Weight _ otherUnits) = do

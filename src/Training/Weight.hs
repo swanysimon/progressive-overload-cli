@@ -17,6 +17,11 @@ instance Eq Weight where
         where
             (Weight y newUnits) = convertWeightUnits otherWeight units
 
+instance Ord Weight where
+    compare (Weight x units) otherWeight = compare x y
+        where
+            (Weight y _) = convertWeightUnits otherWeight units
+
 addWeight :: (Real a) => Weight -> a -> Weight
 addWeight (Weight x units) weightToAdd = Weight newWeight units
     where
