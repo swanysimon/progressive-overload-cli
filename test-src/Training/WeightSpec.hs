@@ -1,121 +1,141 @@
+{-# OPTIONS_GHC -fno-warn-type-defaults #-}
+
 module Training.WeightSpec (
         main, -- only here so module can be run from ghci for debugging
         spec
     ) where
 
+import qualified Plan.CommonPercentages as Percentage
+import qualified Training.CommonKilogramWeights as KG
+import qualified Training.CommonPoundWeights as LB
+import Data.Ratio
 import Test.Hspec
 import Training.Units
 import Training.Weight
-import Training.WeightTestsHelper
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = do
-        describe "checkOrdering" checkOrderingTests
-        describe "addWeight" addScalarToWeightTests
-        describe "addWeights" addWeightToWeightTests
-        describe "convertWeightUnits" convertWeightUnitsTests
-        describe "multiplyWeight" multiplyWeightByScalarTests
+spec = parallel $ do
+        describe "instance of Ord" orderingInstanceTests
+        describe "instance of Eq" equalityInstanceTests
+        describe "function addWeight" addWeightTests
+        describe "function addWeights" addWeightsTests
+        describe "function convertWeightUnits" convertWeightUnitsTests
+        describe "function multiplyWeight" multiplyWeightTests
 
-checkOrderingTests :: SpecWith ()
-checkOrderingTests = do
-        it "tests 0 kilograms is less than 20 kilograms" test_0_kilograms_less_than_20_kilograms
-        it "tests 0 kilograms is less than 44.1 pounds" test_0_kilograms_less_than_44_1_pounds
+orderingInstanceTests :: SpecWith ()
+orderingInstanceTests = do
+        it "tests Weight instance of Ord.(<)" test_weight_ord_less_than
 
-test_0_kilograms_less_than_20_kilograms :: Expectation
-test_0_kilograms_less_than_20_kilograms = checkWeightLessThan zeroKg twentyKg
+test_weight_ord_less_than :: Expectation
+test_weight_ord_less_than = do
+        KG.zero `shouldBeLessThan` KG.twenty
+        KG.zero `shouldBeLessThan` LB.fortyFourPointOne
+        LB.fortyFourPointOne `shouldBeLessThan` KG.forty
+        KG.zero `shouldNotBeLessThan` KG.zero
 
-test_0_kilograms_less_than_44_1_pounds :: Expectation
-test_0_kilograms_less_than_44_1_pounds = checkWeightLessThan zeroKg fortyFourOnePounds
+shouldBeLessThan :: Weight -> Weight -> Expectation
+shouldBeLessThan weight otherWeight = weight `shouldSatisfy` (otherWeight >)
 
-addScalarToWeightTests :: SpecWith ()
-addScalarToWeightTests = do
-        it "tests 0 kilograms plus 20 is 20 kilograms" test_0_kilograms_plus_20
-        it "tests 10 random kilogram additions" test_random_kilogram_additions
-        it "tests 10 random pound additions" test_random_pound_additions
-        -- if any of the randomized tests ever fails, add the specific test case below this line
+shouldNotBeLessThan :: Weight -> Weight -> Expectation
+shouldNotBeLessThan weight otherWeight = do
+        weight `shouldNotSatisfy` (otherWeight >)
+        weight `shouldSatisfy` (otherWeight <=)
 
-test_0_kilograms_plus_20 :: Expectation
-test_0_kilograms_plus_20 = checkWeightsEqual zeroPlusTwentyKilograms twentyKg
-    where
-        zeroPlusTwentyKilograms = addWeight zeroKg (20 :: Double)
+equalityInstanceTests :: SpecWith ()
+equalityInstanceTests = do
+        it "tests weight is equal to itself" test_weight_equal_to_itself
+        it "tests weight equality with conversions" test_weight_equal_with_conversion
+        it "test weight inequality" test_weight_not_equal
 
-test_random_kilogram_additions :: Expectation
-test_random_kilogram_additions = checkTenRandomAdditions Kilograms
+test_weight_equal_to_itself :: Expectation
+test_weight_equal_to_itself = do
+        KG.zero `shouldBeExactWeight` KG.zero
+        KG.twenty `shouldBeExactWeight` KG.twenty
+        LB.zero `shouldBeExactWeight` LB.zero
+        LB.fortyFourPointOne `shouldBeExactWeight` LB.fortyFourPointOne
+        Weight (-1290.14904) Pounds `shouldBeExactWeight` Weight (-1290.14904) Pounds
 
-test_random_pound_additions :: Expectation
-test_random_pound_additions = checkTenRandomAdditions Pounds
+shouldBeExactWeight :: Weight -> Weight -> Expectation
+shouldBeExactWeight weight@(Weight x units) otherWeight@(Weight y otherUnits) = do
+        weight `shouldBe` otherWeight
+        (x, units) `shouldBe` (y, otherUnits)
 
-addWeightToWeightTests :: SpecWith ()
-addWeightToWeightTests = do
-        it "tests 0 kilograms plus 0 pounds is 0 kilograms" test_0_kilograms_plus_0_pounds
-        it "tests 20 kilograms plus 44.1 pounds is 40 kilograms" test_20_kilograms_plus_44_1_pounds
-        it "tests 10 random kilograms plus kilograms operations" test_random_kilograms_plus_kilograms_operations
-        it "tests 10 random pounds plus pounds operations" test_random_pounds_plus_pounds_operations
-        -- if any of the randomized tests ever fails, add the specific test case below this line
+test_weight_equal_with_conversion :: Expectation
+test_weight_equal_with_conversion  = do
+        KG.zero `shouldBeSameWeightDifferentUnits` LB.zero
+        KG.twenty `shouldBeSameWeightDifferentUnits` LB.fortyFourPointOne
+        Weight 1000 Kilograms `shouldBeSameWeightDifferentUnits` Weight 2205 Pounds
 
-test_0_kilograms_plus_0_pounds :: Expectation
-test_0_kilograms_plus_0_pounds = do
-        checkWeightsEqual zeroWeightsAdded zeroKg
-        w `shouldBe` 0
-        units `shouldBe` Kilograms
-    where
-        zeroWeightsAdded@(Weight w units) = addWeights zeroKg zeroPounds
+shouldBeSameWeightDifferentUnits :: Weight -> Weight -> Expectation
+shouldBeSameWeightDifferentUnits weight@(Weight _ units) otherWeight@(Weight _ otherUnits) = do
+        weight `shouldBe` otherWeight
+        units `shouldNotBe` otherUnits
 
-test_20_kilograms_plus_44_1_pounds :: Expectation
-test_20_kilograms_plus_44_1_pounds = do
-        checkWeightsEqual addedWeights fortyKg
-        w `shouldBe` 40
-        units `shouldBe` Kilograms
-    where
-        addedWeights@(Weight w units) = addWeights twentyKg fortyFourOnePounds
+test_weight_not_equal :: Expectation
+test_weight_not_equal = do
+        KG.zero `shouldNotBe` KG.twenty
+        LB.fortyFourPointOne `shouldNotBe` KG.forty
+        Weight 1280395 Pounds `shouldNotBe` Weight (-19) Kilograms
 
-test_random_kilograms_plus_kilograms_operations :: Expectation
-test_random_kilograms_plus_kilograms_operations = checkTenRandomSameUnitAdditions Kilograms
+addWeightTests :: SpecWith ()
+addWeightTests = do
+        it "tests adding to weight" test_add_weight
 
-test_random_pounds_plus_pounds_operations :: Expectation
-test_random_pounds_plus_pounds_operations = checkTenRandomSameUnitAdditions Pounds
+test_add_weight :: Expectation
+test_add_weight = do
+        addWeight KG.zero 20 `shouldBeExactWeight` KG.twenty
+        addWeight LB.zero 135 `shouldBeExactWeight` Weight 135 Pounds
+        addWeight KG.zero 40 `shouldBeExactWeight` KG.forty
+        addWeight KG.forty 90 `shouldBeExactWeight` Weight 130 Kilograms
+        addWeight KG.zero (-20.1253) `shouldBeExactWeight` Weight (toRational (-20.1253)) Kilograms
+
+addWeightsTests :: SpecWith ()
+addWeightsTests = do
+        it "tests same unit weight additions" test_add_weights
+        it "tests different unit weight additions" test_add_weights_with_conversion
+
+test_add_weights :: Expectation
+test_add_weights = do
+        addWeights KG.zero KG.zero `shouldBeExactWeight` KG.zero
+        addWeights KG.zero KG.twenty `shouldBeExactWeight` KG.twenty
+        addWeights KG.twenty KG.zero `shouldBeExactWeight` KG.twenty
+        addWeights KG.twenty KG.twenty `shouldBeExactWeight` KG.forty
+        addWeights LB.zero LB.fortyFourPointOne `shouldBeExactWeight` LB.fortyFourPointOne
+        addWeights (Weight 225 Pounds) (Weight 90 Pounds) `shouldBeExactWeight` Weight 315 Pounds
+        addWeights (Weight 135 Pounds) (Weight (-90) Pounds) `shouldBeExactWeight` Weight 45 Pounds
+        addWeights (Weight 1204 Kilograms) (Weight (1 % 100) Pounds) `shouldBeExactWeight` Weight (530966 % 441) Kilograms
+
+test_add_weights_with_conversion :: Expectation
+test_add_weights_with_conversion = do
+        addWeights KG.zero LB.zero `shouldBeExactWeight` KG.zero
+        addWeights KG.zero LB.fortyFourPointOne `shouldBeExactWeight` KG.twenty
+        addWeights LB.fortyFourPointOne KG.zero `shouldBeSameWeightDifferentUnits` KG.twenty
+        addWeights (Weight 405 Pounds) KG.forty `shouldBeExactWeight` Weight (2466 % 5) Pounds
 
 convertWeightUnitsTests :: SpecWith ()
 convertWeightUnitsTests = do
-        it "tests 0 kilograms is 0 pounds" test_0_kilograms_is_0_pounds
-        it "tests 20 kilograms is 44.1 pounds" test_20_kilograms_is_44_1_pounds
-        it "tests 10 random kilogram conversions" test_random_kilogram_conversions
-        it "tests 10 random pound conversions" test_random_pound_conversions
-        -- if any of the randomized tests ever fails, add the specific test case below this line
+        it "tests weight conversion" test_convert_weight_units
 
-test_0_kilograms_is_0_pounds :: Expectation
-test_0_kilograms_is_0_pounds = checkWeightsEqual zeroKg zeroPounds
+test_convert_weight_units :: Expectation
+test_convert_weight_units = do
+        convertWeightUnits KG.zero Pounds `shouldBeExactWeight` LB.zero
+        convertWeightUnits KG.zero Pounds `shouldBeSameWeightDifferentUnits` KG.zero
+        convertWeightUnits LB.zero Kilograms `shouldBeExactWeight` KG.zero
+        convertWeightUnits KG.twenty Pounds `shouldBeExactWeight` LB.fortyFourPointOne
+        convertWeightUnits KG.forty Kilograms `shouldBeExactWeight` KG.forty
+        convertWeightUnits LB.fortyFourPointOne Pounds `shouldBeExactWeight` LB.fortyFourPointOne
+        convertWeightUnits (Weight 30941.5 Pounds) Pounds `shouldBeExactWeight` Weight 30941.5 Pounds
 
-test_20_kilograms_is_44_1_pounds :: Expectation
-test_20_kilograms_is_44_1_pounds = checkWeightsEqual twentyKg fortyFourOnePounds
+multiplyWeightTests :: SpecWith ()
+multiplyWeightTests = do
+        it "tests multiplying by a weight" test_multiply_weights
 
-test_random_kilogram_conversions :: Expectation
-test_random_kilogram_conversions = checkTenRandomConversions Kilograms Pounds
-
-test_random_pound_conversions :: Expectation
-test_random_pound_conversions = checkTenRandomConversions Pounds Kilograms
-
-multiplyWeightByScalarTests :: SpecWith ()
-multiplyWeightByScalarTests = do
-        it "tests 0 kilograms times any scalar is 0 kilograms" test_0_kilogram_multiplication
-        it "tests 20 kilograms times 2 is 40 kilograms" test_20_kilograms_times_2
-        it "tests 10 random kilograms products" test_random_kilogram_products
-        -- if any of the randomized tests ever fails, add the specific test case below this line
-
-test_0_kilogram_multiplication :: Expectation
-test_0_kilogram_multiplication = do
-        randomNum <- getRandomRational
-        let weightProduct = multiplyWeight zeroKg randomNum
-        checkWeightsEqual zeroKg weightProduct
-
-test_20_kilograms_times_2 :: Expectation
-test_20_kilograms_times_2 = checkWeightsEqual fortyKg weightProduct
-    where
-        weightProduct = multiplyWeight twentyKg (2 :: Double)
-
-test_random_kilogram_products :: Expectation
-test_random_kilogram_products = checkTenRandomProducts Kilograms
+test_multiply_weights :: Expectation
+test_multiply_weights = do
+        multiplyWeight KG.zero 140289 `shouldBeExactWeight` KG.zero
+        multiplyWeight KG.forty Percentage.fifty `shouldBeExactWeight` KG.twenty
+        multiplyWeight LB.fortyFourPointOne 0 `shouldBeExactWeight` LB.zero
 

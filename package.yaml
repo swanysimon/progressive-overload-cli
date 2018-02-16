@@ -9,13 +9,13 @@ github: swanysimon/progressive-overload-cli
 extra-source-files:
     ChangeLog.md
 
-ghc-options: -Wall
-
 dependencies:
     - base == 4.10.1.0
 
 executables:
     progressive-overload:
+        ghc-options:
+            - -Werror
         main: ProgressiveOverload.hs
         source-dirs:
             - bin
@@ -23,7 +23,11 @@ executables:
 
 tests:
     spec:
-        cpp-options: -DTEST
+        cpp-options:
+            - -DTEST
+        ghc-options:
+            - -threaded
+            - -Werror
         main: TestRunner.hs
         source-dirs:
             - src
