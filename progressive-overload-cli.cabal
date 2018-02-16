@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dce4497118b2e67f38cdc9cafd7bfc19a844b25d97b5301dc87754af57f019be
+-- hash: 9d41e1dec8cb2154c81714091e50fea3409e0555fc7dbabeb85e9adb17ceb861
 
 name:           progressive-overload-cli
 version:        0.1.1
@@ -74,10 +74,12 @@ test-suite spec
       Training.WorkingSet
       Training.Workout
       Util.CycleEnum
+      Plan.Juggernaut.JuggernautMethodSpec
       Plan.Juggernaut.JuggernautPhaseSpec
       Plan.Juggernaut.JuggernautWaveSpec
       Training.CommonKilogramWeights
       Training.CommonPoundWeights
+      Training.CommonWorkouts
       Training.WeightSpec
       Paths_progressive_overload_cli
   default-language: Haskell2010

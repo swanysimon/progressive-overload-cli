@@ -87,7 +87,7 @@ addWeightTests = do
 test_add_weight :: Expectation
 test_add_weight = do
         addWeight KG.zero 20 `shouldBeExactWeight` KG.twenty
-        addWeight LB.zero 135 `shouldBeExactWeight` Weight 135 Pounds
+        addWeight LB.zero 135 `shouldBeExactWeight` LB.oneThirtyFive
         addWeight KG.zero 40 `shouldBeExactWeight` KG.forty
         addWeight KG.forty 90 `shouldBeExactWeight` Weight 130 Kilograms
         addWeight KG.zero (-20.1253) `shouldBeExactWeight` Weight (toRational (-20.1253)) Kilograms
@@ -104,8 +104,8 @@ test_add_weights = do
         addWeights KG.twenty KG.zero `shouldBeExactWeight` KG.twenty
         addWeights KG.twenty KG.twenty `shouldBeExactWeight` KG.forty
         addWeights LB.zero LB.fortyFourPointOne `shouldBeExactWeight` LB.fortyFourPointOne
-        addWeights (Weight 225 Pounds) (Weight 90 Pounds) `shouldBeExactWeight` Weight 315 Pounds
-        addWeights (Weight 135 Pounds) (Weight (-90) Pounds) `shouldBeExactWeight` Weight 45 Pounds
+        addWeights LB.twoTwentyFive LB.ninety `shouldBeExactWeight` Weight 315 Pounds
+        addWeights LB.oneThirtyFive (Weight (-90) Pounds) `shouldBeExactWeight` LB.fortyFive
         addWeights (Weight 1204 Kilograms) (Weight (1 % 100) Pounds) `shouldBeExactWeight` Weight (530966 % 441) Kilograms
 
 test_add_weights_with_conversion :: Expectation
