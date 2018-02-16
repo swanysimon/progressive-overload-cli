@@ -1,5 +1,5 @@
-module Plan.Juggernaut.JuggernautProgram (
-        JuggernautProgram(JuggernautProgram)
+module Plan.Juggernaut.JuggernautMethod (
+        JuggernautMethod(JuggernautMethod)
     ) where
 
 import qualified Plan.CommonPercentages as Percentage
@@ -14,12 +14,12 @@ import Training.Weight
 import Training.WorkingSet
 import Training.Workout
 
-data JuggernautProgram = JuggernautProgram Exercise Wave Phase Weight
+data JuggernautMethod = JuggernautMethod Exercise Wave Phase Weight
     deriving (Eq, Read, Show)
 
-instance Program JuggernautProgram where
+instance Program JuggernautMethod where
 
-    asWorkout (JuggernautProgram exercise wave phase weight) = case phase of
+    asWorkout (JuggernautMethod exercise wave phase weight) = case phase of
             Accumulation -> accumulationWorkout exercise weight
             Intensification -> intensificationWorkout exercise weight
             Realization -> realizationWorkout exercise weight
@@ -41,9 +41,9 @@ instance Program JuggernautProgram where
                     Fives -> fivesRealizationWorkout
                     Threes -> threesRealizationWorkout
 
-    begin exercise workingMax = JuggernautProgram exercise Tens Accumulation workingMax
+    begin exercise workingMax = JuggernautMethod exercise Tens Accumulation workingMax
 
-    next program@(JuggernautProgram e v p w) workout = JuggernautProgram e nextWave nextPhase nextWeight
+    next program@(JuggernautMethod e v p w) workout = JuggernautMethod e nextWave nextPhase nextWeight
         where
             nextWave = Cycle.next v
             nextPhase = Cycle.next p
@@ -137,8 +137,8 @@ deload e weight = fortyForFive : fiftyForFive : sixtyForFive : []
         fiftyForFive = calculateSet e 5 weight Percentage.fifty
         sixtyForFive = calculateSet e 5 weight Percentage.sixty
 
-calculateNewWorkingMax :: JuggernautProgram -> Workout -> Weight
-calculateNewWorkingMax (JuggernautProgram e v _ w@(Weight _ units)) workout
+calculateNewWorkingMax :: JuggernautMethod -> Workout -> Weight
+calculateNewWorkingMax (JuggernautMethod e v _ w@(Weight _ units)) workout
         | cleanedWorkout == [] = error "Cannot calculate new working maximum on an exercise that was not performed"
         | otherwise = adjustWorkingMax calculatedMax calculatedWorkingMax
     where
