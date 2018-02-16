@@ -43,13 +43,14 @@ instance Program JuggernautMethod where
 
     begin exercise workingMax = JuggernautMethod exercise Tens Accumulation workingMax
 
-    next program@(JuggernautMethod e v p w) workout = JuggernautMethod e nextWave nextPhase nextWeight
+    next program@(JuggernautMethod exercise wave phase weight) workout = case phase of
+            Realization -> JuggernautMethod exercise wave nextPhase newWorkingMax
+            Deload -> JuggernautMethod exercise nextWave nextPhase weight
+            _ -> JuggernautMethod exercise wave nextPhase weight
         where
-            nextWave = Cycle.next v
-            nextPhase = Cycle.next p
-            nextWeight
-                    | p == Realization = calculateNewWorkingMax program workout
-                    | otherwise = w
+            nextPhase = Cycle.next phase
+            newWorkingMax = calculateNewWorkingMax program workout
+            nextWave = Cycle.next wave
 
 tensAccumulationWorkout :: Exercise -> Weight -> Workout
 tensAccumulationWorkout e weight = lastSetAsAmrap . replicate 5 . calculateSet e 10 weight $ Percentage.sixty
@@ -149,7 +150,7 @@ calculateNewWorkingMax (JuggernautMethod e v _ w@(Weight _ units)) workout
         calculatedWorkingMax = estimateWorkingMax realizationSet w v
 
 {-
- - The Juggernaut Program states that you should adjust your estimated working max to never be
+ - The Juggernaut Method states that you should adjust your estimated working max to never be
  - more than 95% of your calculated one rep max
  -}
 adjustWorkingMax :: Weight -> Weight -> Weight
