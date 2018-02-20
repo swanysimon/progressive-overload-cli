@@ -7,5 +7,5 @@ import Training.Repetitions
 import Training.Weight
 
 data WorkingSet = WorkingSet Repetitions Weight
-    deriving (Eq)
+    deriving (Eq, Read, Show)
 

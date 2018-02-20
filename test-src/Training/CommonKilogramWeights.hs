@@ -1,7 +1,8 @@
 module Training.CommonKilogramWeights (
         zero,
         twenty,
-        forty
+        forty,
+        oneThousand
     ) where
 
 import Training.Units
@@ -15,4 +16,7 @@ twenty = Weight 20 Kilograms
 
 forty :: Weight
 forty = Weight 40 Kilograms
+
+oneThousand :: Weight
+oneThousand = Weight 1000 Kilograms
 

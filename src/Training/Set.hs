@@ -10,7 +10,7 @@ import Training.Weight
 import Training.WorkingSet
 
 data Set = Set Exercise WorkingSet
-    deriving (Eq)
+    deriving (Eq, Read, Show)
 
 calculateSet :: Exercise -> Integer -> Weight -> Rational -> Set
 calculateSet exercise reps weight percentage = Set exercise . WorkingSet reps . multiplyWeight weight $ percentage

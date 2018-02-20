@@ -4,7 +4,8 @@ module Training.CommonPoundWeights (
         fortyFive,
         ninety,
         oneThirtyFive,
-        twoTwentyFive
+        twoTwentyFive,
+        oneThousand
     ) where
 
 import Data.Ratio
@@ -28,4 +29,7 @@ oneThirtyFive = Weight 135 Pounds
 
 twoTwentyFive :: Weight
 twoTwentyFive = Weight 225 Pounds
+
+oneThousand :: Weight
+oneThousand = Weight 1000 Pounds
 

@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9d41e1dec8cb2154c81714091e50fea3409e0555fc7dbabeb85e9adb17ceb861
+-- hash: b12defaa8379c67af6ff2fca2f6def2625645b58d23190791324965151d7c83a
 
 name:           progressive-overload-cli
 version:        0.1.1
@@ -28,7 +28,7 @@ executable progressive-overload
   hs-source-dirs:
       bin
       src
-  ghc-options: -Werror
+  ghc-options: -Wall
   build-depends:
       base ==4.10.1.0
   other-modules:
@@ -54,7 +54,7 @@ test-suite spec
   hs-source-dirs:
       src
       test-src
-  ghc-options: -threaded -Werror
+  ghc-options: -threaded -Wall
   cpp-options: -DTEST
   build-depends:
       base ==4.10.1.0

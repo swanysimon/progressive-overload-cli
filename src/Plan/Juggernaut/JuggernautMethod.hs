@@ -56,7 +56,7 @@ tensAccumulationWorkout :: Exercise -> Weight -> Workout
 tensAccumulationWorkout e weight = lastSetAsAmrap . replicate 5 . calculateSet e 10 weight $ Percentage.sixty
 
 lastSetAsAmrap :: Workout -> Workout
-lastSetAsAmrap ((Set e (WorkingSet _ w)):[]) = [Set e . WorkingSet 0 $ w]
+lastSetAsAmrap ((Set e (WorkingSet _ w)):[]) = [Set e $ WorkingSet 0 w]
 lastSetAsAmrap (x:xs) = x : lastSetAsAmrap xs
 lastSetAsAmrap _ = []
 
@@ -100,7 +100,7 @@ threesIntensificationWorkout e weight = seventyForOne : seventySevenPointFiveFor
 tensRealizationWorkout :: Exercise -> Weight -> Workout
 tensRealizationWorkout e weight = lastSetAsAmrap . (++) ys . firstElementForOne $ zs
     where
-        (ys,zs) = splitAt 3 . take 4 . realizationRampUp e $ weight
+        (ys,zs) = splitAt 2 . take 4 . realizationRampUp e $ weight
         firstElementForOne [] = []
         firstElementForOne ((Set _ (WorkingSet _ w)):xs) = (Set e (WorkingSet 1 w)) : xs
 
@@ -167,6 +167,7 @@ estimateWorkingMax (Set _ (WorkingSet reps _)) workingMax wave = addWeights work
         smallestIncrement = Weight 5 Pounds
 
 calculate1Rm :: Set -> Weight
+calculate1Rm (Set _ (WorkingSet 1 weight)) = weight
 calculate1Rm (Set _ (WorkingSet reps weight)) = addWeights weight extraCapacity
     where
         extraCapacity = multiplyWeight weight . (*) Percentage.oneRepMaxVolumeScalar . toRational $ reps

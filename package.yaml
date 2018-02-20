@@ -15,7 +15,7 @@ dependencies:
 executables:
     progressive-overload:
         ghc-options:
-            - -Werror
+            - -Wall
         main: ProgressiveOverload.hs
         source-dirs:
             - bin
@@ -27,7 +27,7 @@ tests:
             - -DTEST
         ghc-options:
             - -threaded
-            - -Werror
+            - -Wall
         main: TestRunner.hs
         source-dirs:
             - src

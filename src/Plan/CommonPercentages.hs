@@ -21,7 +21,7 @@ module Plan.CommonPercentages (
 import Data.Ratio
 
 oneRepMaxVolumeScalar :: Rational
-oneRepMaxVolumeScalar = 33 % 1000
+oneRepMaxVolumeScalar = 1 % 30
 
 forty :: Rational
 forty = 2 % 5
