@@ -2,7 +2,6 @@ module Training.CommonWorkouts (
         fiveByFiveAtOneThirtyFive
     ) where
 
-import qualified Training.CommonKilogramWeights as KG
 import qualified Training.CommonPoundWeights as LB
 import Training.Exercise
 import Training.WorkingSet
