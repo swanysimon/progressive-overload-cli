@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b12defaa8379c67af6ff2fca2f6def2625645b58d23190791324965151d7c83a
+-- hash: 4dbce39b5a0a8db85235724b70d908ad5fd1476d086e8b958330a63f6f69ba1e
 
 name:           progressive-overload-cli
 version:        0.1.1
@@ -37,12 +37,7 @@ executable progressive-overload
       Plan.Juggernaut.JuggernautPhase
       Plan.Juggernaut.JuggernautWave
       Plan.Program
-      Training.Exercise
-      Training.Repetitions
-      Training.Set
-      Training.Units
       Training.Weight
-      Training.WorkingSet
       Training.Workout
       Util.CycleEnum
       Paths_progressive_overload_cli
@@ -66,12 +61,7 @@ test-suite spec
       Plan.Juggernaut.JuggernautPhase
       Plan.Juggernaut.JuggernautWave
       Plan.Program
-      Training.Exercise
-      Training.Repetitions
-      Training.Set
-      Training.Units
       Training.Weight
-      Training.WorkingSet
       Training.Workout
       Util.CycleEnum
       Plan.Juggernaut.JuggernautMethodSpec

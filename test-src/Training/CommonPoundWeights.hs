@@ -9,7 +9,6 @@ module Training.CommonPoundWeights (
     ) where
 
 import Data.Ratio
-import Training.Units
 import Training.Weight
 
 zero :: Weight

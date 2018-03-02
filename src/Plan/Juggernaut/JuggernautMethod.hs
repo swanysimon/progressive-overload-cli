@@ -1,5 +1,6 @@
 module Plan.Juggernaut.JuggernautMethod (
-        JuggernautMethod(JuggernautMethod)
+        JuggernautMethod(..),
+        calculateSet -- visible for testing
     ) where
 
 import qualified Plan.CommonPercentages as Percentage
@@ -7,11 +8,7 @@ import qualified Util.CycleEnum as Cycle
 import Plan.Program
 import Plan.Juggernaut.JuggernautPhase
 import Plan.Juggernaut.JuggernautWave
-import Training.Exercise
-import Training.Set
-import Training.Units
 import Training.Weight
-import Training.WorkingSet
 import Training.Workout
 
 data JuggernautMethod = JuggernautMethod Exercise Wave Phase Weight
@@ -20,11 +17,12 @@ data JuggernautMethod = JuggernautMethod Exercise Wave Phase Weight
 instance Program JuggernautMethod where
 
     asWorkout (JuggernautMethod exercise wave phase weight) = case phase of
-            Accumulation -> accumulationWorkout exercise weight
-            Intensification -> intensificationWorkout exercise weight
-            Realization -> realizationWorkout exercise weight
-            Deload -> deload exercise weight
+            Accumulation -> toWorkout accumulationWorkout
+            Intensification -> toWorkout intensificationWorkout
+            Realization -> toWorkout realizationWorkout
+            Deload -> toWorkout deload
         where
+            toWorkout workoutFunction = workoutFunction exercise weight
             accumulationWorkout = case wave of
                     Tens -> tensAccumulationWorkout
                     Eights -> eightsAccumulationWorkout
@@ -55,8 +53,13 @@ instance Program JuggernautMethod where
 tensAccumulationWorkout :: Exercise -> Weight -> Workout
 tensAccumulationWorkout e weight = lastSetAsAmrap . replicate 5 . calculateSet e 10 weight $ Percentage.sixty
 
+calculateSet :: Exercise -> Repetitions -> Weight -> Rational -> Set
+calculateSet exerciseName repsToPerform workingMax percentage = Set exerciseName repsToPerform workingWeight
+    where
+        workingWeight = multiplyWeight workingMax percentage
+
 lastSetAsAmrap :: Workout -> Workout
-lastSetAsAmrap ((Set e (WorkingSet _ w)):[]) = [Set e $ WorkingSet 0 w]
+lastSetAsAmrap ((Set e _ w):[]) = [Set e 0 w]
 lastSetAsAmrap (x:xs) = x : lastSetAsAmrap xs
 lastSetAsAmrap _ = []
 
@@ -102,7 +105,7 @@ tensRealizationWorkout e weight = lastSetAsAmrap . (++) ys . firstElementForOne 
     where
         (ys,zs) = splitAt 2 . take 4 . realizationRampUp e $ weight
         firstElementForOne [] = []
-        firstElementForOne ((Set _ (WorkingSet _ w)):xs) = (Set e (WorkingSet 1 w)) : xs
+        firstElementForOne ((Set _ _ w):xs) = (Set e 1 w) : xs
 
 realizationRampUp :: Exercise -> Weight -> Workout
 realizationRampUp e weight = fiftyForFive
@@ -144,7 +147,7 @@ calculateNewWorkingMax (JuggernautMethod e v _ w@(Weight _ units)) workout
         | otherwise = adjustWorkingMax calculatedMax calculatedWorkingMax
     where
         cleanedWorkout = map (\s -> convertSetUnits s units) . filter isSetForExercise $ workout
-        isSetForExercise (Set exercise _) = exercise == e
+        isSetForExercise (Set exercise _ _) = exercise == e
         calculatedMax = calculate1Rm realizationSet
         realizationSet = last cleanedWorkout
         calculatedWorkingMax = estimateWorkingMax realizationSet w v
@@ -159,7 +162,7 @@ adjustWorkingMax calculatedMax@(Weight _ units) calculatedWorkingMax@(Weight _ o
         | otherwise = min calculatedWorkingMax . multiplyWeight calculatedMax $ Percentage.ninetyFive
 
 estimateWorkingMax :: Set -> Weight -> Wave -> Weight
-estimateWorkingMax (Set _ (WorkingSet reps _)) workingMax wave = addWeights workingMax extraCapacity
+estimateWorkingMax (Set _ reps _) workingMax wave = addWeights workingMax extraCapacity
     where
         extraCapacity = multiplyWeight smallestIncrement extraReps
         extraReps = (-) reps . expectedRepetitions $ wave
@@ -167,8 +170,8 @@ estimateWorkingMax (Set _ (WorkingSet reps _)) workingMax wave = addWeights work
         smallestIncrement = Weight 5 Pounds
 
 calculate1Rm :: Set -> Weight
-calculate1Rm (Set _ (WorkingSet 1 weight)) = weight
-calculate1Rm (Set _ (WorkingSet reps weight)) = addWeights weight extraCapacity
+calculate1Rm (Set _ 1 weight) = weight
+calculate1Rm (Set _ reps weight) = addWeights weight extraCapacity
     where
         extraCapacity = multiplyWeight weight . (*) Percentage.oneRepMaxVolumeScalar . toRational $ reps
 

@@ -1,9 +1,9 @@
 module Plan.Juggernaut.JuggernautWave (
-        Wave(Tens, Eights, Fives, Threes),
+        Wave(..),
         expectedRepetitions
     ) where
 
-import Training.Repetitions
+import Training.Workout
 import Util.CycleEnum
 
 data Wave = Tens

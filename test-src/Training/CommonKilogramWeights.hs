@@ -5,7 +5,6 @@ module Training.CommonKilogramWeights (
         oneThousand
     ) where
 
-import Training.Units
 import Training.Weight
 
 zero :: Weight

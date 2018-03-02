@@ -11,8 +11,6 @@ import Plan.Juggernaut.JuggernautMethod
 import Plan.Juggernaut.JuggernautPhase
 import Plan.Juggernaut.JuggernautWave
 import Test.Hspec
-import Training.Set
-import Training.Units
 import Training.Weight
 
 main :: IO ()

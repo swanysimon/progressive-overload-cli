@@ -5,7 +5,6 @@ module Plan.Program (
         next
     ) where
 
-import Training.Exercise
 import Training.Weight
 import Training.Workout
 

@@ -1,5 +1,5 @@
 module Plan.Juggernaut.JuggernautPhase (
-        Phase(Accumulation, Intensification, Realization, Deload)
+        Phase(..)
     ) where
 
 import Util.CycleEnum

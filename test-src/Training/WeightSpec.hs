@@ -10,7 +10,6 @@ import qualified Training.CommonKilogramWeights as KG
 import qualified Training.CommonPoundWeights as LB
 import Data.Ratio
 import Test.Hspec
-import Training.Units
 import Training.Weight
 
 main :: IO ()

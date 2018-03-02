@@ -1,5 +1,6 @@
 module Training.Weight (
-        Weight(Weight),
+        Units(..),
+        Weight(..),
         addWeight,
         addWeights ,
         convertWeightUnits,
@@ -7,7 +8,9 @@ module Training.Weight (
     ) where
 
 import Data.Ratio
-import Training.Units
+
+data Units = Kilograms | Pounds
+    deriving (Eq, Read, Show)
 
 data Weight = Weight Rational Units
     deriving (Read, Show)
