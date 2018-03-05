@@ -1,6 +1,8 @@
 module Training.Weight (
+        MinimumWeightJump,
         Units(..),
         Weight(..),
+        WorkingMax,
         addWeight,
         addWeights ,
         convertWeightUnits,
@@ -8,6 +10,9 @@ module Training.Weight (
     ) where
 
 import Data.Ratio
+
+type MinimumWeightJump = Weight
+type WorkingMax = Weight
 
 data Units = Kilograms | Pounds
     deriving (Eq, Read, Show)

@@ -29,33 +29,36 @@ programInstanceTests = do
 
 test_program_begin :: Expectation
 test_program_begin = do
-        begin "" KG.zero `shouldBe` JuggernautMethod "" Tens Accumulation KG.zero
-        begin "squat" KG.zero `shouldBe` JuggernautMethod "squat" Tens Accumulation KG.zero
-        begin "bench" KG.forty `shouldBe` JuggernautMethod "bench" Tens Accumulation KG.forty
-        begin "asdfjkl;" LB.fortyFourPointOne `shouldBe` JuggernautMethod "asdfjkl;" Tens Accumulation LB.fortyFourPointOne
+        begin "" KG.zero minJump `shouldBe` JuggernautMethod "" Tens Accumulation KG.zero minJump
+        begin "squat" KG.zero minJump `shouldBe` JuggernautMethod "squat" Tens Accumulation KG.zero minJump
+        begin "bench" KG.forty minJump `shouldBe` JuggernautMethod "bench" Tens Accumulation KG.forty minJump
+        begin "asdfjkl;" LB.fortyFourPointOne minJump `shouldBe` JuggernautMethod "asdfjkl;" Tens Accumulation LB.fortyFourPointOne minJump
+
+minJump :: MinimumWeightJump
+minJump = Weight 5 Pounds
 
 test_program_next :: Expectation
 test_program_next = do
         next tensAccumulation fiveByFive `shouldBe` tensIntensification
-        next tensRealization fiveByFive `shouldBe` JuggernautMethod exercise Tens Deload (Weight (-25) Pounds)
+        next tensRealization fiveByFive `shouldBe` JuggernautMethod exercise Tens Deload (Weight (-25) Pounds) minJump
         next tensDeload fiveByFive `shouldBe` eightsAccumulation
         next eightsDeload fiveByFive `shouldBe` fivesAccumulation
         next fivesDeload fiveByFive `shouldBe` threesAccumulation
         next threesDeload fiveByFive `shouldBe` tensAccumulation
     where
-        tensAccumulation = JuggernautMethod exercise Tens Accumulation zeroWeight
+        tensAccumulation = JuggernautMethod exercise Tens Accumulation zeroWeight minJump
         exercise = "squat"
         zeroWeight = LB.zero
         fiveByFive = Workouts.fiveByFiveAtOneThirtyFive exercise
-        tensIntensification = JuggernautMethod exercise Tens Intensification zeroWeight
-        tensRealization = JuggernautMethod exercise Tens Realization zeroWeight
-        tensDeload = JuggernautMethod exercise Tens Deload zeroWeight
-        eightsAccumulation = JuggernautMethod exercise Eights Accumulation zeroWeight
-        eightsDeload = JuggernautMethod exercise Eights Deload zeroWeight
-        fivesAccumulation = JuggernautMethod exercise Fives Accumulation zeroWeight
-        fivesDeload = JuggernautMethod exercise Fives Deload zeroWeight
-        threesAccumulation = JuggernautMethod exercise Threes Accumulation zeroWeight
-        threesDeload = JuggernautMethod exercise Threes Deload zeroWeight
+        tensIntensification = JuggernautMethod exercise Tens Intensification zeroWeight minJump
+        tensRealization = JuggernautMethod exercise Tens Realization zeroWeight minJump
+        tensDeload = JuggernautMethod exercise Tens Deload zeroWeight minJump
+        eightsAccumulation = JuggernautMethod exercise Eights Accumulation zeroWeight minJump
+        eightsDeload = JuggernautMethod exercise Eights Deload zeroWeight minJump
+        fivesAccumulation = JuggernautMethod exercise Fives Accumulation zeroWeight minJump
+        fivesDeload = JuggernautMethod exercise Fives Deload zeroWeight minJump
+        threesAccumulation = JuggernautMethod exercise Threes Accumulation zeroWeight minJump
+        threesDeload = JuggernautMethod exercise Threes Deload zeroWeight minJump
 
 test_program_as_workout :: Expectation
 test_program_as_workout = do
@@ -64,32 +67,32 @@ test_program_as_workout = do
         asWorkout eightsIntensification `shouldBe` eightsIntensificationWorkout
         asWorkout threesDeload `shouldBe` threesDeloadWorkout
     where
-        tensRealization = JuggernautMethod exercise Tens Realization LB.oneThousand
+        tensRealization = JuggernautMethod exercise Tens Realization LB.oneThousand minJump
         exercise = "bench press"
         tensRealizationWorkout = [
-                calculateSet exercise 5 (Weight 500 Pounds) 1,
-                calculateSet exercise 3 (Weight 600 Pounds) 1,
-                calculateSet exercise 1 (Weight 700 Pounds) 1,
-                calculateSet exercise 0 (Weight 750 Pounds) 1]
-        eightsRealization = JuggernautMethod exercise Eights Realization LB.oneThousand
+                calculateSet exercise 5 (Weight 500 Pounds) 1 minJump,
+                calculateSet exercise 3 (Weight 600 Pounds) 1 minJump,
+                calculateSet exercise 1 (Weight 700 Pounds) 1 minJump,
+                calculateSet exercise 0 (Weight 750 Pounds) 1 minJump]
+        eightsRealization = JuggernautMethod exercise Eights Realization LB.oneThousand minJump
         eightsRealizationWorkout = [
-                calculateSet exercise 5 (Weight 500 Pounds) 1,
-                calculateSet exercise 3 (Weight 600 Pounds) 1,
-                calculateSet exercise 2 (Weight 700 Pounds) 1,
-                calculateSet exercise 1 (Weight 750 Pounds) 1,
-                calculateSet exercise 0 (Weight 800 Pounds) 1]
-        eightsIntensification = JuggernautMethod exercise Eights Intensification KG.oneThousand
+                calculateSet exercise 5 (Weight 500 Pounds) 1 minJump,
+                calculateSet exercise 3 (Weight 600 Pounds) 1 minJump,
+                calculateSet exercise 2 (Weight 700 Pounds) 1 minJump,
+                calculateSet exercise 1 (Weight 750 Pounds) 1 minJump,
+                calculateSet exercise 0 (Weight 800 Pounds) 1 minJump]
+        eightsIntensification = JuggernautMethod exercise Eights Intensification KG.oneThousand minJump
         eightsIntensificationWorkout = [
-                calculateSet exercise 3 (Weight 600 Kilograms) 1,
-                calculateSet exercise 3 (Weight 675 Kilograms) 1,
-                calculateSet exercise 8 (Weight 725 Kilograms) 1,
-                calculateSet exercise 8 (Weight 725 Kilograms) 1,
-                calculateSet exercise 0 (Weight 725 Kilograms) 1]
-        threesDeload = JuggernautMethod exercise Threes Deload (Weight 11.4529 Kilograms)
+                calculateSet exercise 3 (Weight 600 Kilograms) 1 minJump,
+                calculateSet exercise 3 (Weight 675 Kilograms) 1 minJump,
+                calculateSet exercise 8 (Weight 725 Kilograms) 1 minJump,
+                calculateSet exercise 8 (Weight 725 Kilograms) 1 minJump,
+                calculateSet exercise 0 (Weight 725 Kilograms) 1 minJump]
+        threesDeload = JuggernautMethod exercise Threes Deload (Weight 11.4529 Kilograms) minJump
         threesDeloadWorkout = [
-                calculateSet exercise 5 (Weight 4.58116 Kilograms) 1,
-                calculateSet exercise 5 (Weight 5.72645 Kilograms) 1,
-                calculateSet exercise 5 (Weight 6.87174 Kilograms) 1]
+                calculateSet exercise 5 (Weight 4.58116 Kilograms) 1 minJump,
+                calculateSet exercise 5 (Weight 5.72645 Kilograms) 1 minJump,
+                calculateSet exercise 5 (Weight 6.87174 Kilograms) 1 minJump]
 
 calculateNewWorkingMaxTests :: SpecWith ()
 calculateNewWorkingMaxTests = do
@@ -103,29 +106,29 @@ test_working_max_increase = do
         next eightsRealization [thirteenReps] `shouldBe` eightsDeload (Weight 1025 Pounds)
         next threesRealization [sevenReps] `shouldBe` threesDeload (Weight 1020 Pounds)
     where
-        tensRealization = JuggernautMethod exercise Tens Realization LB.oneThousand
+        tensRealization = JuggernautMethod exercise Tens Realization LB.oneThousand minJump
         exercise = "deadlift"
-        fifteenReps = calculateSet exercise 15 tensRealizationWeight 1
+        fifteenReps = calculateSet exercise 15 tensRealizationWeight 1 minJump
         tensRealizationWeight = Weight 750 Pounds
-        tensDeload = JuggernautMethod exercise Tens Deload
-        twentyReps = calculateSet exercise 20 tensRealizationWeight 1
-        eightsRealization = JuggernautMethod exercise Eights Realization LB.oneThousand
-        thirteenReps = calculateSet exercise 13 (Weight 800 Pounds) 1
-        eightsDeload = JuggernautMethod exercise Eights Deload
-        threesRealization = JuggernautMethod exercise Threes Realization LB.oneThousand
-        sevenReps = calculateSet exercise 7 (Weight 900 Pounds) 1
-        threesDeload = JuggernautMethod exercise Threes Deload
+        tensDeload workingMax = JuggernautMethod exercise Tens Deload workingMax minJump
+        twentyReps = calculateSet exercise 20 tensRealizationWeight 1 minJump
+        eightsRealization = JuggernautMethod exercise Eights Realization LB.oneThousand minJump
+        thirteenReps = calculateSet exercise 13 (Weight 800 Pounds) 1 minJump
+        eightsDeload workingMax = JuggernautMethod exercise Eights Deload workingMax minJump
+        threesRealization = JuggernautMethod exercise Threes Realization LB.oneThousand minJump
+        sevenReps = calculateSet exercise 7 (Weight 900 Pounds) 1 minJump
+        threesDeload workingMax = JuggernautMethod exercise Threes Deload workingMax minJump
 
 test_limit_working_max :: Expectation
 test_limit_working_max = do
         next tensRealization [fifteenReps] `shouldBe` tensDeload (Weight 408.5 Pounds)
         next fivesRealization [eightReps] `shouldBe` fivesDeload (Weight 969 Pounds)
     where
-        tensRealization = JuggernautMethod exercise Tens Realization (Weight 400 Pounds)
+        tensRealization = JuggernautMethod exercise Tens Realization (Weight 400 Pounds) minJump
         exercise = "overhead press"
-        fifteenReps = calculateSet exercise 13 (Weight 300 Pounds) 1
-        tensDeload = JuggernautMethod exercise Tens Deload
-        fivesRealization = JuggernautMethod exercise Fives Realization LB.oneThousand
-        eightReps = calculateSet exercise 6 (Weight 850 Pounds) 1
-        fivesDeload = JuggernautMethod exercise Fives Deload
+        fifteenReps = calculateSet exercise 13 (Weight 300 Pounds) 1 minJump
+        tensDeload workingMax = JuggernautMethod exercise Tens Deload workingMax minJump
+        fivesRealization = JuggernautMethod exercise Fives Realization LB.oneThousand minJump
+        eightReps = calculateSet exercise 6 (Weight 850 Pounds) 1 minJump
+        fivesDeload workingMax = JuggernautMethod exercise Fives Deload workingMax minJump
 

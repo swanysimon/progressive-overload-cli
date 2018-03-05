@@ -11,7 +11,7 @@ import Training.Workout
 class Program p where
     asWorkout :: p -> Workout
 
-    begin :: Exercise -> Weight -> p
+    begin :: Exercise -> WorkingMax -> MinimumWeightJump -> p
 
     next :: p -> Workout -> p
 
