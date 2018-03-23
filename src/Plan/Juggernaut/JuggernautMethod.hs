@@ -65,7 +65,7 @@ calculateSet :: Exercise -> Repetitions -> WorkingMax -> Rational -> MinimumWeig
 calculateSet exercise repsToPerform workingMax percentage minJump = roundSetToMinimumWeightJump calculatedSet minJump
     where
         -- TODO: figure this out
-        roundSetToMinimumWeightJump s m = s
+        roundSetToMinimumWeightJump s _ = s
         calculatedSet = Set exercise repsToPerform workingWeight
         workingWeight = multiplyWeight workingMax percentage
 
@@ -152,35 +152,43 @@ deload exercise workingMax minJump = fortyForFive : fiftyForFive : sixtyForFive 
         fiftyForFive = calculateSet exercise 5 workingMax Percentage.fifty minJump
         sixtyForFive = calculateSet exercise 5 workingMax Percentage.sixty minJump
 
-calculateNewWorkingMax :: JuggernautMethod -> Workout -> Weight
-calculateNewWorkingMax (JuggernautMethod exercise wave _ workingMax minJump@(Weight _ units)) workout
-        | cleanedWorkout == [] = error "Cannot calculate new working maximum on an exercise that was not performed"
-        | otherwise = adjustWorkingMax calculatedMax calculatedWorkingMax
-    where
-        cleanedWorkout = map (\s -> convertSetUnits s units) . filter isSetForExercise $ workout
-        isSetForExercise (Set e _ _) = e == exercise
-        calculatedMax = calculate1Rm realizationSet
-        realizationSet = last cleanedWorkout
-        calculatedWorkingMax = estimateWorkingMax realizationSet workingMax minJump wave
-
 {-
  - The Juggernaut Method states that you should adjust your estimated working max to never be
  - more than 95% of your calculated one rep max
+ -
+ - I ignore this when someone performs the expected numberby keeping the weight the same
+ -
+ - I also ignore this when the calculated 95% max is less than the previous weight when someone
+ - performs more than the expected number of reps
  -}
-adjustWorkingMax :: Weight -> Weight -> Weight
-adjustWorkingMax calculatedMax@(Weight _ units) calculatedWorkingMax@(Weight _ otherUnits)
-        | units /= otherUnits = adjustWorkingMax calculatedMax . convertWeightUnits calculatedWorkingMax $ units
-        | otherwise = min calculatedWorkingMax . multiplyWeight calculatedMax $ Percentage.ninetyFive
+calculateNewWorkingMax :: JuggernautMethod -> Workout -> Weight
+calculateNewWorkingMax (JuggernautMethod exercise wave _ workingMax minJump@(Weight _ units)) workout
+        | cleanedWorkout == [] = error "Cannot calculate new working maximum on an exercise that was not performed"
+        | otherwise = adjustWorkingMax realizationSet wave workingMax minJump
+    where
+        cleanedWorkout = map (\s -> convertSetUnits s units) . filter isSetForExercise $ workout
+        isSetForExercise (Set e _ _) = e == exercise
+        realizationSet = last cleanedWorkout
+
+adjustWorkingMax :: Set -> Wave -> WorkingMax -> MinimumWeightJump -> Weight
+adjustWorkingMax realizationSet@(Set _ repsPerformed _) wave workingMax@(Weight _ units) minJump@(Weight _ otherUnits)
+        | units /= otherUnits = adjustWorkingMax realizationSet wave convertedWorkingMax minJump
+        | repsPerformed == expectedRepetitions wave = workingMax
+        | repsPerformed > expectedRepetitions wave = max workingMax adjustedWorkingMax
+        | otherwise = adjustedWorkingMax
+    where
+        convertedWorkingMax = convertWeightUnits workingMax otherUnits
+        adjustedWorkingMax = min calculatedWorkingMax calculatedMax
+        calculatedWorkingMax = estimateWorkingMax realizationSet workingMax minJump wave
+        calculatedMax = multiplyWeight new1Rm Percentage.ninetyFive
+        new1Rm = calculate1Rm realizationSet
 
 estimateWorkingMax :: Set -> WorkingMax -> MinimumWeightJump -> Wave -> Weight
 estimateWorkingMax (Set _ reps _) workingMax minJump wave = addWeights workingMax extraCapacity
     where
         extraCapacity = multiplyWeight minJump extraReps
-        extraReps = (-) reps . expectedRepetitions $ wave
+        extraReps = reps - expectedRepetitions wave
 
 calculate1Rm :: Set -> Weight
-calculate1Rm (Set _ 1 weight) = weight
-calculate1Rm (Set _ reps weight) = addWeights weight extraCapacity
-    where
-        extraCapacity = multiplyWeight weight . (*) Percentage.oneRepMaxVolumeScalar . toRational $ reps
+calculate1Rm (Set _ reps weight) = addWeights weight . multiplyWeight weight . (*) Percentage.oneRepMaxVolumeScalar . toRational $ reps
 

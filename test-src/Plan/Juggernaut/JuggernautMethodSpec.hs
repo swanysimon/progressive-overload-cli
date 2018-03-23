@@ -97,7 +97,8 @@ test_program_as_workout = do
 calculateNewWorkingMaxTests :: SpecWith ()
 calculateNewWorkingMaxTests = do
         it "tests weight increases by minimum weight increase times reps above expected" test_working_max_increase
-        it "tests limits to 95% of calculated 1RM" test_limit_working_max
+        it "tests limits to 95% of calculated 1RM" test_calculated_working_max
+        it "tests sets floor of current working max when performs at least expected number of reps" test_working_max_floor
 
 test_working_max_increase :: Expectation
 test_working_max_increase = do
@@ -119,16 +120,25 @@ test_working_max_increase = do
         sevenReps = calculateSet exercise 7 (Weight 900 Pounds) 1 minJump
         threesDeload workingMax = JuggernautMethod exercise Threes Deload workingMax minJump
 
-test_limit_working_max :: Expectation
-test_limit_working_max = do
-        next tensRealization [fifteenReps] `shouldBe` tensDeload (Weight 408.5 Pounds)
-        next fivesRealization [eightReps] `shouldBe` fivesDeload (Weight 969 Pounds)
+test_calculated_working_max :: Expectation
+test_calculated_working_max = do
+        next tensRealization [thirteenReps] `shouldBe` tensDeload (Weight 408.5 Pounds)
+        next tensRealization [fourteenReps] `shouldBe` tensDeload (Weight 418 Pounds)
     where
         tensRealization = JuggernautMethod exercise Tens Realization (Weight 400 Pounds) minJump
         exercise = "overhead press"
-        fifteenReps = calculateSet exercise 13 (Weight 300 Pounds) 1 minJump
+        thirteenReps = calculateSet exercise 13 (Weight 300 Pounds) 1 minJump
         tensDeload workingMax = JuggernautMethod exercise Tens Deload workingMax minJump
+        fourteenReps = calculateSet exercise 14 (Weight 300 Pounds) 1 minJump
+
+test_working_max_floor :: Expectation
+test_working_max_floor = do
+        next fivesRealization [fiveReps] `shouldBe` fivesDeload LB.oneThousand
+        next fivesRealization [sixReps] `shouldBe` fivesDeload LB.oneThousand
+    where
+        exercise = "snatch"
         fivesRealization = JuggernautMethod exercise Fives Realization LB.oneThousand minJump
-        eightReps = calculateSet exercise 6 (Weight 850 Pounds) 1 minJump
+        fiveReps = calculateSet exercise 5 (Weight 850 Pounds) 1 minJump
         fivesDeload workingMax = JuggernautMethod exercise Fives Deload workingMax minJump
+        sixReps = calculateSet exercise 6 (Weight 850 Pounds) 1 minJump
 
